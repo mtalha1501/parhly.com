@@ -1,0 +1,125 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.11.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "vite": "^6.0.0"
+  },
+  "notFoundPage": {
+    "component": "NotFoundPage",
+    "imports": [
+      {
+        "module": "react-router-dom",
+        "namedImports": [
+          "Link"
+        ]
+      }
+    ],
+    "code": "export default function NotFoundPage() {\n  return (\n    <div className=\"page\">\n      <section className=\"card\">\n        <h1 className=\"title\" style={{ marginTop: 0 }}>Page not found</h1>\n        <p className=\"subtitle\">The page you’re looking for doesn’t exist.</p>\n        <div className=\"buttonRow\">\n          <Link className=\"primary\" to=\"/\">Go home</Link>\n          <Link className=\"primary outline\" to=\"/auth?role=student&mode=login\">Login</Link>\n        </div>\n      </section>\n    </div>\n  )\n}"
+  },
+  "coursesPage": {
+    "component": "CoursesPage",
+    "imports": [
+      {
+        "module": "react-router-dom",
+        "namedImports": [
+          "Link"
+        ]
+      }
+    ],
+    "code": "import { Link } from 'react-router-dom'\n\nfunction getRole() {\n  try {\n    const raw = localStorage.getItem('parhly.auth')\n    const auth = raw ? JSON.parse(raw) : null\n    return auth?.role === 'teacher' ? 'teacher' : 'student'\n  } catch {\n    return 'student'\n  }\n}\n\nconst DEMO_COURSES = [\n  { id: 'wd-101', title: 'Web Dev 101', desc: 'HTML, CSS, basic React layout.' },\n  { id: 'node-api', title: 'Node APIs', desc: 'REST basics, routes, controllers.' },\n  { id: 'mongo', title: 'MongoDB Fundamentals', desc: 'Schemas, queries, indexing.' },\n]\n\nexport default function CoursesPage() {\n  const role = getRole()\n\n  return (\n    <div className=\"page\">\n      <div className=\"pageHeader\">\n        <div className=\"headerRow\">\n          <div>\n            <h1 className=\"title\">Courses</h1>\n            <p className=\"subtitle\">\n              {role === 'teacher'\n                ? 'Preview courses you can publish and manage.'\n                : 'Browse courses you can enroll in.'}\n            </p>\n          </div>\n          <Link className=\"primary outline\" to=\"/dashboard\">\n            Back to dashboard\n          </Link>\n        </div>\n      </div>\n\n      <div className=\"cardGrid\">\n        {DEMO_COURSES.map((c) => (\n          <div className=\"tile\" key={c.id}>\n            <div className=\"tileTitle\">{c.title}</div>\n            <div className=\"tileText\">{c.desc}</div>\n            <div style={{ marginTop: 12 }}>\n              <button type=\"button\" className=\"primary\" disabled>\n                {role === 'teacher' ? 'Manage (coming soon)' : 'Enroll (coming soon)'}\n              </button>\n            </div>\n          </div>\n        ))}\n      </div>\n    </div>\n  )\n}"
+  },
+  "teacherDashboardPage": {
+    "component": "TeacherDashboardPage",
+    "imports": [
+      {
+        "module": "react-router-dom",
+        "namedImports": [
+          "Link",
+          "useNavigate"
+        ]
+      }
+    ],
+    "code": "import { Link, useNavigate } from 'react-router-dom'\n\nfunction getAuth() {\n  try {\n    const raw = localStorage.getItem('parhly.auth')\n    return raw ? JSON.parse(raw) : null\n  } catch {\n    return null\n  }\n}\n\nexport default function TeacherDashboardPage() {\n  const navigate = useNavigate()\n  const auth = getAuth()\n  const name = auth?.name || auth?.email || 'Teacher'\n\n  function logout() {\n    localStorage.removeItem('parhly.auth')\n    navigate('/')\n  }\n\n  return (\n    <div className=\"page\">\n      <div className=\"pageHeader\">\n        <div className=\"headerRow\">\n          <div>\n            <h1 className=\"title\">Teacher Dashboard</h1>\n            <p className=\"subtitle\">Welcome, {name}. Manage your courses and students.</p>\n          </div>\n          <button type=\"button\" className=\"primary outline\" onClick={logout}>\n            Logout\n          </button>\n        </div>\n      </div>\n\n      <section className=\"card\">\n        <div className=\"cardTitle\">Quick actions</div>\n        <div className=\"buttonRow\">\n          <Link className=\"primary\" to=\"/courses\">\n            View courses\n          </Link>\n          <Link className=\"primary outline\" to=\"/auth?role=teacher&mode=login\">\n            Manage account\n          </Link>\n        </div>\n\n        <div className=\"notice\" style={{ marginTop: 12 }}>\n          Course creation/enrollment will be added when the backend APIs are connected.\n        </div>\n      </section>\n    </div>\n  )\n}"
+  },
+  "studentDashboardPage": {
+    "component": "StudentDashboardPage",
+    "imports": [
+      {
+        "module": "react-router-dom",
+        "namedImports": [
+          "Link",
+          "useNavigate"
+        ]
+      }
+    ],
+    "code": "import { Link, useNavigate } from 'react-router-dom'\n\nfunction getAuth() {\n  try {\n    const raw = localStorage.getItem('parhly.auth')\n    return raw ? JSON.parse(raw) : null\n  } catch {\n    return null\n  }\n}\n\nexport default function StudentDashboardPage() {\n  const navigate = useNavigate()\n  const auth = getAuth()\n  const name = auth?.name || auth?.email || 'Student'\n\n  function logout() {\n    localStorage.removeItem('parhly.auth')\n    navigate('/')\n  }\n\n  return (\n    <div className=\"page\">\n      <div className=\"pageHeader\">\n        <div className=\"headerRow\">\n          <div>\n            <h1 className=\"title\">Student Dashboard</h1>\n            <p className=\"subtitle\">Welcome, {name}.</p>\n          </div>\n          <button type=\"button\" className=\"primary outline\" onClick={logout}>\n            Logout\n          </button>\n        </div>\n      </div>\n\n      <section className=\"card\">\n        <div className=\"cardTitle\">Quick actions</div>\n        <div className=\"buttonRow\">\n          <Link className=\"primary\" to=\"/courses\">\n            Browse courses\n          </Link>\n          <Link className=\"primary outline\" to=\"/auth?role=student&mode=login\">\n            Manage account\n          </Link>\n        </div>\n\n        <div className=\"notice\" style={{ marginTop: 12 }}>\n          This is a placeholder dashboard (no backend connected yet).\n        </div>\n      </section>\n    </div>\n  )\n}"
+  },
+  "authPage": {
+    "component": "AuthPage",
+    "imports": [
+      {
+        "module": "react-router-dom",
+        "namedImports": [
+          "Link",
+          "useNavigate",
+          "useSearchParams"
+        ]
+      }
+    ],
+    "code": "import { useEffect, useMemo, useState } from 'react'\nimport { Link, useNavigate, useSearchParams } from 'react-router-dom'\n\nexport default function AuthPage() {\n  const [searchParams, setSearchParams] = useSearchParams()\n  const navigate = useNavigate()\n\n  const [mode, setMode] = useState('login')\n  const [role, setRole] = useState('student')\n  const [form, setForm] = useState({ email: '', name: '' })\n  const [serverMessage, setServerMessage] = useState('')\n  const [loading, setLoading] = useState(false)\n\n  useEffect(() => {\n    const m = searchParams.get('mode')\n    const r = searchParams.get('role')\n    if (m) setMode(m)\n    if (r) setRole(r)\n  }, [searchParams])\n\n  const isLogin = mode === 'login'\n  const isStudent = role === 'student'\n\n  const title = isLogin\n    ? `Welcome back${isStudent ? ', student' : ''}!`\n    : `Join as ${role === 'teacher' ? 'Instructor' : 'Student'}`\n\n  const toggleMode = () => {\n    setMode((prev) => (prev === 'login' ? 'signup' : 'login'))\n    setServerMessage('')\n  }\n\n  const updateField = (field) => (e) => {\n    setForm((prev) => ({ ...prev, [field]: e.target.value }))\n  }\n\n  function validate() {\n    if (!form.email.includes('@')) {\n      setServerMessage('Please enter a valid email address.')\n      return false\n    }\n    if (!isLogin && (!form.name || form.name.length < 2)) {\n      setServerMessage('Name must be at least 2 characters.')\n      return false\n    }\n    return true\n  }\n\n  async function onSubmit(e) {\n    e.preventDefault()\n    setServerMessage('')\n\n    if (!validate()) return\n\n    setLoading(true)\n    try {\n      // Backend will be implemented next. For now, just simulate.\n      await new Promise((r) => setTimeout(r, 600))\n\n      const payload = {\n        role,\n        mode,\n        email: form.email.trim(),\n        name: form.name.trim(),\n        ts: Date.now(),\n      }\n      localStorage.setItem('parhly.auth', JSON.stringify(payload))\n\n      setServerMessage(`Saved locally: ${mode.toUpperCase()} as ${role}. Redirecting...`)\n      navigate('/dashboard')\n    } finally {\n      setLoading(false)\n    }\n  }\n\n  return (\n    <div className=\"page authPage\">\n      <section className=\"card\">\n        <h1 className=\"title\" style={{ marginTop: 0 }}>{title}</h1>\n        <p className=\"subtitle\">\n          {isLogin\n            ? 'Login to continue managing your courses.'\n            : 'Sign up to start exploring courses.'}\n        </p>\n\n        <form onSubmit={onSubmit} style={{ marginTop: 24 }}>\n          <div className=\"inputGroup\">\n            <label>Email address</label>\n            <input\n              type=\"email\"\n              required\n              value={form.email}\n              onChange={updateField('email')}\n              disabled={loading}\n            />\n          </div>\n          {!isLogin && (\n            <div className=\"inputGroup\">\n              <label>Full name</label>\n              <input\n                type=\"text\"\n                required\n                value={form.name}\n                onChange={updateField('name')}\n                disabled={loading}\n              />\n            </div>\n          )}\n\n          <div className=\"buttonRow\">\n            <button type=\"submit\" className=\"primary\" disabled={loading}>\n              {loading\n                ? 'Loading...'\n                : isLogin\n                ? 'Login'\n                : 'Sign up'}\n            </button>\n          </div>\n\n          {serverMessage && (\n            <div className=\"serverMessage\" style={{ marginTop: 12 }}>\n              {serverMessage}\n            </div>\n          )}\n        </form>\n\n        <div className=\"divider\" style={{ marginTop: 24, marginBottom: 16 }}>\n          or\n        </div>\n\n        <div className=\"buttonRow\">\n          <Link className=\"primary outline" to="/auth?role=student&mode=login">\n            Login as Student\n          </Link>\n          <Link className="primary outline" to="/auth?role=teacher&mode=login">\n            Login as Teacher\n          </Link>\n        </div>\n\n        <div className="notice" style={{ marginTop: 12 }}>\n          By continuing, you agree to our Terms of Service and Privacy Policy.\n        </div>\n      </section>\n    </div>\n  )\n}"
+  },
+  "routes": {
+    "component": "AppRoutes",
+    "imports": [
+      {
+        "module": "react-router-dom",
+        "namedImports": [
+          "Navigate",
+          "Route",
+          "Routes"
+        ]
+      },
+      {
+        "module": "./pages/EntryPage.jsx"
+      },
+      {
+        "module": "./pages/AuthPage.jsx"
+      },
+      {
+        "module": "./pages/StudentDashboardPage.jsx"
+      },
+      {
+        "module": "./pages/TeacherDashboardPage.jsx"
+      },
+      {
+        "module": "./pages/CoursesPage.jsx"
+      },
+      {
+        "module": "./pages/NotFoundPage.jsx"
+      }
+    ],
+    "code": "import { Navigate, Route, Routes } from 'react-router-dom'\nimport EntryPage from './pages/EntryPage.jsx'\nimport AuthPage from './pages/AuthPage.jsx'\nimport StudentDashboardPage from './pages/StudentDashboardPage.jsx'\nimport TeacherDashboardPage from './pages/TeacherDashboardPage.jsx'\nimport CoursesPage from './pages/CoursesPage.jsx'\nimport NotFoundPage from './pages/NotFoundPage.jsx'\n\nfunction getStoredAuth() {\n  try {\n    const raw = localStorage.getItem('parhly.auth')\n    return raw ? JSON.parse(raw) : null\n  } catch {\n    return null\n  }\n}\n\nfunction DashboardGate() {\n  const auth = getStoredAuth()\n  if (!auth?.role) return <Navigate to=\"/auth?role=student&mode=login\" replace />\n  return auth.role === 'teacher'\n    ? <Navigate to=\"/teacher\" replace />\n    : <Navigate to=\"/student\" replace />\n}\n\nexport default function AppRoutes() {\n  return (\n    <Routes>\n      <Route path=\"/\" element={<EntryPage />} />\n      <Route path=\"/auth\" element={<AuthPage />} />\n\n      <Route path=\"/dashboard\" element={<DashboardGate />} />\n      <Route path=\"/student\" element={<StudentDashboardPage />} />\n      <Route path=\"/teacher\" element={<TeacherDashboardPage />} />\n      <Route path=\"/courses\" element={<CoursesPage />} />\n\n      <Route path=\"/404\" element={<NotFoundPage />} />\n      <Route path=\"*\" element={<Navigate to=\"/404\" replace />} />\n    </Routes>\n  )\n}"
+  }
+}
